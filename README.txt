@@ -1,0 +1,1 @@
+http://spiderdave.github.com/spidey-supybot-plugins/
