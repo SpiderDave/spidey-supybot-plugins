@@ -211,6 +211,8 @@ class _Plugin(callbacks.Plugin):
                   s='(from ' + detectedlanguage+") "+s
             s=s.replace("\u0026", "&")
             s=s.replace(r'\x26#39;',"'")
+            s=s.replace(r'\x26gt;',">")
+            s=s.replace(r'\x26lt;',"<")
             s=re.sub(r'&#(1?\d\d);', lambda match: chr(int(match.group(1))), s)
             irc.reply(s)
         else:
