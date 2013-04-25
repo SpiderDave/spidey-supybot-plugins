@@ -2,6 +2,7 @@
 # by SpiderDave
 ###
 
+import supybot.conf as conf
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
@@ -27,15 +28,20 @@ class _Plugin(callbacks.Plugin):
         if not name:
             name = msg.nick
 
-        try:
-            os.makedirs('%s' % self.data_path)
-        except OSError:
-            pass
+
+        filename = conf.supybot.directories.data.dirize("superhero.txt")
+        f=open(filename,'a+b')
+        f.close()
+        f=open(filename,'r+b')
+        superhero=f.readlines()
+
+
 
         try:
-            f=open('%ssuperhero.txt' % self.data_path, 'a+b')
+            filename = conf.supybot.directories.data.dirize("superhero.txt")
+            f=open(filename,'a+b')
             f.close()
-            f=open('%ssuperhero.txt' % self.data_path, 'r+b')
+            f=open(filename,'r+b')
             superhero=f.readlines()
         except:
             irc.reply('error :(')
