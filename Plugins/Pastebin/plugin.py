@@ -28,6 +28,7 @@ class _Plugin(callbacks.Plugin):
         try:
             f = open('%s%spastebin.dat' % (conf.supybot.directories.data(), os.sep), 'r')
             api_dev_key=f.read().strip()
+            f.close()
         except:
             irc.reply('Error: missing or invalid api dev key.  Check pastebin.dat file in your data folder.')
             return
