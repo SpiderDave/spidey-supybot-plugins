@@ -3,13 +3,14 @@
 ###
 
 import supybot.utils as utils
+import supybot.conf as conf
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import os
 
-import tmdb
+import tmdb3 as tmdb
 
 # This will be used to change the name of the class to the folder name
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
@@ -25,23 +26,28 @@ class _Plugin(callbacks.Plugin):
         """
         
         try:
-            t = tmdb.search(text)
+            f = open('%s%stmdbkey.dat' % (conf.supybot.directories.data(), os.sep), 'r')
+            key=f.read().strip()
+            f.close
         except:
-            irc.reply("Error: I couldn't get that information")
+            irc.reply('Error: missing or key.  Check tmdbkey.dat file in your data folder.')
             return
-
-
+        
+        tmdb.set_key(key)
+        tmdb.set_cache('null')
+        
         try:
-            m=t[0]
+            res=tmdb.searchMovie(text)
         except:
-            irc.reply('Not found.')
+            irc.reply("Error: I couldn't get a response from TMDb.")
             return
         
-        for key in m.keys():
-            if isinstance(m[key],basestring):
-                m[key]=m[key].encode('UTF-8')
-        
-        irc.reply('%s %s (%s) %s: %s' % (m['url'], ircutils.bold(m['name']),m['released'].split('-')[0], m['rating'], m['overview']))
+        if len(res)==0:
+            irc.reply("Sorry, I couldn't find anything on that one.")
+            return
+        res=res[0] #just use the first one found
+        text='%s (%s) %s/10 http://www.themoviedb.org/movie/%s %s' % ( ircutils.bold(res.title), res.releasedate.year, res.userrating, res.id, res.overview)
+        irc.reply(text)
     tmdb = wrap(tmdb, ['text'])
 
 
