@@ -4,19 +4,13 @@
 ###
 
 import supybot.utils as utils
+import supybot.conf as conf
+import supybot.ircdb as ircdb
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import random, os
-
-def capability(msg, c):
-    try:
-        u = ircdb.users.getUser(msg.prefix)
-        if u._checkCapability(c):
-            return True
-    except:
-        return False
 
 # This will be used to change the name of the class to the folder name
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
@@ -31,15 +25,27 @@ class _Plugin(callbacks.Plugin):
 
         Slaps <someone> with a random silly object.  Slap add <an object> will add an item to the slaplist.
         """
-        f=open('%sslap.txt' % self.pluginpath, 'a+b')
-        l=open('%sslap.txt' % self.pluginpath, 'a+b').readlines()
+
+        slapFile='%s%sslap.txt' % (conf.supybot.directories.data(), os.sep)
+        if not os.path.isfile(slapFile):
+            try:
+                f = open(slapFile, 'w+b')
+                f.write("a large trout" + "\n")
+                f.close()
+            except:
+                irc.reply('Error: could not create slap.txt file in the data folder.')
+                return
+        
+        f = open('%s%sslap.txt' % (conf.supybot.directories.data(), os.sep), 'a+b')
+        l=f.readlines()
+        
         t=l[random.randint(0,len(l)-1)]
         t = t.replace("\'", "'").replace("\r", "").replace("\n", "")
         if not stuff:
             stuff="someone"
         if (stuff.lower() == irc.nick.lower()) or (stuff.lower() == 'yourself'):
             try:
-                fmeta=open('%sbot_meta.txt' % self.pluginpath, 'a+b')
+                fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'a+b')
                 gender=fmeta.read().split('gender=')[1].splitlines()[0].strip().lower()
                 if gender=='male':
                     stuff="himself"
@@ -66,7 +72,7 @@ class _Plugin(callbacks.Plugin):
             irc.reply("Yo dawg.  I herd you like slaplists, so we put a slap in your list so you get slapped while you list.", prefixNick=False)
             irc.reply(format("slaps %s around a bit with SpiderDave's slaplist",msg.nick) +".", action=True)
         elif stuff.split(' ',1)[0].lower()=="--setgender":
-            if not capability(msg, 'owner'):
+            if not ircdb.checkCapability(msg.prefix,'owner'):
                 irc.error("Only my owner can make me do that.  It's a painful process you know!")
                 return
             stuff=stuff.split(' ',1)[1]
@@ -74,7 +80,7 @@ class _Plugin(callbacks.Plugin):
             if stuff not in self.validgenders:
                 irc.error('Error: valid genders are ' + '/'.join(self.validgenders) + '.')
                 return
-            fmeta=open('%sbot_meta.txt' % self.pluginpath, 'w+b') #wipes file
+            fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'w+b') #wipes file
             fmeta.write('gender=' + stuff + "\n")
             irc.reply("Gender set to %s" % stuff)
         else:
@@ -87,8 +93,19 @@ class _Plugin(callbacks.Plugin):
 
         Attacks <someone> with a random message.  When adding attacks, use _ in place of the nick.  Ex. "Attack add bitch-slaps _".
         """
-        f=open('%sattack.txt' % self.pluginpath, 'a+b')
-        l=open('%sattack.txt' % self.pluginpath, 'a+b').readlines()
+        attackFile='%s%sattack.txt' % (conf.supybot.directories.data(), os.sep)
+        if not os.path.isfile(attackFile):
+            try:
+                f = open(attackFile, 'w+b')
+                f.write("hits _ in the shins with an oversized ruler" + "\n")
+                f.close()
+            except:
+                irc.reply('Error: could not create slap.txt file in the data folder.')
+                return
+        
+        f = open('%s%sattack.txt' % (conf.supybot.directories.data(), os.sep), 'a+b')
+        l=f.readlines()
+
         t=l[random.randint(0,len(l)-1)]
         t = t.replace("\'", "'").replace("\r", "").replace("\n", "")
         if not stuff:
@@ -126,7 +143,7 @@ class _Plugin(callbacks.Plugin):
             irc.reply("Allow me to demonstrate:", prefixNick=False)
             irc.reply(t.replace('_',msgs.nick) + "... Twice.", action=True)
         elif stuff.split(' ',1)[0].lower()=="--setgender":
-            if not capability(msg, 'owner'):
+            if not ircdb.checkCapability(msg.prefix,'owner'):
                 irc.error("Only my owner can make me do that.  It's a painful process you know!")
                 return
             stuff=stuff.split(' ',1)[1]
@@ -143,7 +160,7 @@ class _Plugin(callbacks.Plugin):
             if t.endswith('..'):
                 t=t[:-1]
             irc.reply(t, action=True)
-#    attack = wrap(attack, [additional('text')])
+    attack = wrap(attack, [additional('text')])
     # **********************************************************************
 
 _Plugin.__name__=PluginName
