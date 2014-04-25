@@ -3,6 +3,7 @@
 ###
 
 import supybot.utils as utils
+import supybot.conf as conf
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
@@ -22,15 +23,24 @@ class _Plugin(callbacks.Plugin):
         post <text> to pastebin.com.  Expires in 1 month.
         """
         threaded=True
-        api_url = 'http://pastebin.com/api_public.php'
+        api_url = 'http://pastebin.com/api/api_post.php'
+        
+        try:
+            f = open('%s%spastebin.dat' % (conf.supybot.directories.data(), os.sep), 'r')
+            api_dev_key=f.read().strip()
+        except:
+            irc.reply('Error: missing or invalid api dev key.  Check pastebin.dat file in your data folder.')
+            return
+        
         #valid_paste_expire_dates = ('N', '10M', '1H', '1D', '1M')
         
-        values = {'paste_code' : text,
-                  'paste_name' : irc.nick,
-                  #'paste_subdomain':'test',
-                  'paste_format':'text',
-                  'paste_private':1,
-                  'paste_expire_date' : '1M'
+        values = {'api_option' : 'paste',
+                  'api_dev_key' : api_dev_key,
+                  'api_paste_code' : text,
+                  'api_paste_private':'1',
+                  'api_paste_name' : irc.nick,
+                  'api_paste_expire_date' : '1M',
+                  'api_paste_format':'text',
                   }
 
         data = urllib.urlencode(values)
