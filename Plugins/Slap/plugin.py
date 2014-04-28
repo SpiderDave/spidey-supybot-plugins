@@ -16,7 +16,6 @@ import random, os
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
 class _Plugin(callbacks.Plugin):
     """This plugin is for slapping people with random things.  Joy!"""
-    pluginpath=os.path.dirname( __file__ ) + os.sep
     validgenders=['male','female', 'none']
 
     # **********************************************************************
@@ -112,7 +111,7 @@ class _Plugin(callbacks.Plugin):
             stuff="someone"
         if (stuff.lower() == irc.nick.lower()) or (stuff.lower() == 'yourself'):
             try:
-                fmeta=open('%sbot_meta.txt' % self.pluginpath, 'a+b')
+                fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'a+b')
                 gender=fmeta.read().split('gender=')[1].splitlines()[0].strip().lower()
                 if gender=='male':
                     stuff="himself"
@@ -151,7 +150,7 @@ class _Plugin(callbacks.Plugin):
             if stuff not in self.validgenders:
                 irc.error('Error: valid genders are ' + '/'.join(self.validgenders) + '.')
                 return
-            fmeta=open('%sbot_meta.txt' % self.pluginpath, 'w+b') #wipes file
+            fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'w+b') #wipes file
             fmeta.write('gender=' + stuff + "\n")
             irc.reply("Gender set to %s" % stuff)
         else:
