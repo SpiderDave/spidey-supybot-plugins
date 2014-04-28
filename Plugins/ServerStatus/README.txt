@@ -1,0 +1,1 @@
+Checks the server status of various games.
