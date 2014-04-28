@@ -22,9 +22,8 @@ def configure(advanced):
 P = conf.registerPlugin(PluginName)
 P.__name__ = PluginName
 
-# This is where your configuration variables (if any) should go.  For example:
-# conf.registerGlobalValue(PluginName, 'someConfigVariableName',
-#     registry.Boolean(False, """Help for someConfigVariableName."""))
-
+conf.registerGlobalValue(P, 'pastebinAPIkey', registry.String('', ("""Your pastebin.com API key."""), private=True))
+conf.registerGlobalValue(P, 'visibility', registry.String('Unlisted', ("""Paste visibility. Default unlisted. Must be one of the following: Public, Unlisted, Private""")))
+conf.registerGlobalValue(P, 'expire', registry.String('1Month', ("""Paste expiration date. Default 1Month. Must be one of the following: Never, 10min, 1Hour, 1Day, 1Month""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

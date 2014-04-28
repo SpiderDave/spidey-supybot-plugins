@@ -10,6 +10,9 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import os
 import urllib, urllib2
+from time import gmtime, strftime
+
+# documentation from: http://pastebin.com/api
 
 # This will be used to change the name of the class to the folder name
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
@@ -17,41 +20,72 @@ class _Plugin(callbacks.Plugin):
     """This plugin contains a command to upload text to pastebin.com."""
     threaded = True
 
-    def pastebin (self, irc, msg, args, text):
-        """<text>
+    def pastebin (self, irc, msg, args, opts, text):
+        """[--visibility public|unlisted|private] [--title name] [--expire never|10min|1hour|1day|1month] <text>
         
-        post <text> to pastebin.com.  Expires in 1 month.
+        post <text> to pastebin.com.
+        Default visibility is unlisted. Default expiration is never.
         """
-        threaded=True
-        api_url = 'http://pastebin.com/api/api_post.php'
         
-        try:
-            f = open('%s%spastebin.dat' % (conf.supybot.directories.data(), os.sep), 'r')
-            api_dev_key=f.read().strip()
-            f.close()
-        except:
-            irc.reply('Error: missing or invalid api dev key.  Check pastebin.dat file in your data folder.')
+        api_key = self.registryValue('pastebinAPIkey')
+
+        if api_key == '':
+            irc.reply('Error: Pastebin API key must be set. See plugins.pastebinAPIkey value.')
             return
         
-        #valid_paste_expire_dates = ('N', '10M', '1H', '1D', '1M')
+        api_url = 'http://pastebin.com/api/api_post.php'
         
-        values = {'api_option' : 'paste',
-                  'api_dev_key' : api_dev_key,
-                  'api_paste_code' : text,
-                  'api_paste_private':'1',
-                  'api_paste_name' : irc.nick,
-                  'api_paste_expire_date' : '1M',
-                  'api_paste_format':'text',
-                  }
+        # default args.
+        visibility = self.registryValue('visibility').lower()
+        expire = self.registryValue('expire').lower()
+        title = msg.nick + "@" + msg.args[0] + "@" + strftime("%a, %d %b %Y %H:%M:%S +0000", gmtime())
+        
+        # input options
+        for (key, value) in opts:
+            if key == 'visibility':
+                visibility = value
+            if key == 'title' or key == "pastename":
+                title = value
+            if key == 'expire':
+                expire = value
+        
+        # map visibility and expire to proper values via key
+        visibility_map = {'public': '0', 'unlisted': '1', 'private': '2'}
+        visibility = visibility_map[visibility]
+        expire_map = {'never': 'N', '10min': '10M', '1hour': '1H', '1day': '1D', '1month': '1M'}
+        expire = expire_map[expire]
 
+        # post values
+        values = {'api_paste_code': text,
+                  'api_paste_name': title,
+                  'api_paste_format':'text',
+                  'api_paste_private': visibility,
+                  'api_paste_expire_date': expire,
+                  'api_option': 'paste',
+                  'api_dev_key': api_key
+                  }
+        
         data = urllib.urlencode(values)
         req = urllib2.Request(api_url, data)
         response = urllib2.urlopen(req)
         the_page = response.read()
+        
+        # print return data or url
         irc.reply(the_page)
 
-    pastebin = wrap(pastebin, ['text'])
-
+    pastebin = wrap(pastebin, [getopts({'visibility': ('literal',
+                                                        ('public',
+                                                        'unlisted',
+                                                        'private')),
+                                         'pastename': ('something'),
+                                         'title': ('something'),
+                                         'expire': ('literal',
+                                                    ('never',
+                                                    '10min',
+                                                    '1hour',
+                                                    '1day',
+                                                    '1month'))
+                                                        }), ('text')])
 
 _Plugin.__name__=PluginName
 Class = _Plugin
