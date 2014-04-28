@@ -15,8 +15,6 @@ PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
 class _Plugin(callbacks.Plugin):
     """This plugin generates a random superhero description for the given nick."""
     threaded = True
-    plugin_path=os.path.dirname( __file__ ) + os.sep
-    data_path=plugin_path + 'data' + os.sep
     # **********************************************************************
     # Note: the superhero text is saved in a text file so that each nick gives 
     # the same unique power.  I think it's more fun this way.
