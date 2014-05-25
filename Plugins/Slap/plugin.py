@@ -38,7 +38,7 @@ class _Plugin(callbacks.Plugin):
         f = open('%s%sslap.txt' % (conf.supybot.directories.data(), os.sep), 'a+b')
         l=f.readlines()
         
-        t=l[random.randint(0,len(l)-1)]
+        t=random.choice(l)
         t = t.replace("\'", "'").replace("\r", "").replace("\n", "")
         if not stuff:
             stuff="someone"
@@ -105,7 +105,7 @@ class _Plugin(callbacks.Plugin):
         f = open('%s%sattack.txt' % (conf.supybot.directories.data(), os.sep), 'a+b')
         l=f.readlines()
 
-        t=l[random.randint(0,len(l)-1)]
+        t=random.choice(l)
         t = t.replace("\'", "'").replace("\r", "").replace("\n", "")
         if not stuff:
             stuff="someone"
