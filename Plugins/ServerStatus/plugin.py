@@ -23,6 +23,9 @@ class _Plugin(callbacks.Plugin):
     """Contains commands for checking the server status of various games."""
     threaded = True
     def diablo3(self, irc, msg, args):
+        """
+        Get Diablo 3 server status from www.gstatus.de
+        """
         url = 'http://www.gstatus.de/game/diablo3'
         try:
             html = utils.web.getUrl(url)
@@ -41,30 +44,20 @@ class _Plugin(callbacks.Plugin):
     diablo3 = wrap(diablo3)
     
     def leagueoflegends(self, irc, msg, args):
-        # site is slow :(
-        url = 'http://www.islolup.com'
+        """
+        Get League of Legends server status from www.lolking.net
+        """
+        url = 'http://www.lolking.net/status' #the /status page is outdated; we're really just grabbing it from the header.
         try:
             html = utils.web.getUrl(url)
         except:
-            irc.reply("Error: could not get a response from islolup.com.")
+            irc.reply("Error: could not get a response from www.lolking.net")
             return
-        servers=('North American','Western European','Eastern European','Public Beta','Korean','Brazilian')
-        status=[]
-        for server in servers:
-            m = re.search(r'http://([a-z]*?)\.islolup.com\'>' + server + ' Servers</a.*?<div class=\'leftbig(.*?)\'.*?</div>', html, re.I | re.S)
-            if m:
-                if not m.group(1):
-                    irc.reply("Error: I couldn't get information from islolup.com.")
-                    return
-                serverNameShort=m.group(1).strip()
-                s=m.group(2).strip()
-            else:
-                s='unknown'
-            status.append('%s: %s ' % (serverNameShort, s))
-        
-        status=' | '.join(status)
-        
-        irc.reply('LoL Server Status: %s' % status)
+        m = re.search(r'<span id="online_servers".*?>(.*?)</span>.*?<span id="offline_servers".*?>(.*?)</span>.*?fallback: \'(.*?)\'', html, re.I | re.S)
+        if m:
+            irc.reply('%s %s | %s' % (m.group(1),m.group(3),m.group(2)))
+        else:
+            irc.reply("Error: could not get server status.")
     leagueoflegends = wrap(leagueoflegends)
 
 
