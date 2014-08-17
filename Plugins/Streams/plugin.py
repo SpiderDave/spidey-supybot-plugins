@@ -39,21 +39,18 @@ class _Plugin(callbacks.Plugin):
     """Add the help for "@plugin help <Plugin Name>" here
     This should describe *how* to use this plugin."""
     threaded = True
-    def jtvlive(self, irc, msg, args, things):
+    def twitchtvlive(self, irc, msg, args, things):
         """ <channel> [<channel> ...]
         
-        Displays current live Justin.tv channels given a list.
+        Displays current live Twitch.tv channels given a list.  Note: channel names are case-sensitive.
         """
-        #kawaiirice, fxomoonglade, hashe, liquidtlo, liquidhuk, liquidhaypro, spanishiwa
         channels=things
         
-        searchurl='http://api.justin.tv/api/stream/list.json'
+        searchurl='https://api.twitch.tv/kraken/streams'
         headers = utils.web.defaultHeaders
-        #usernames=['kawaiirice','fxomoonglade','hashe','liquidtlo','liquidhuk','liquidhaypro','spanishiwa']
         islive=[]
         out=[]
-
-
+        
         opts = {}
         opts['channel']=','.join(channels)
         fd = utils.web.getUrlFd('%s?%s' % (searchurl,
@@ -66,19 +63,21 @@ class _Plugin(callbacks.Plugin):
             # Most likely no streams are live
             pass
         else:
-            for c in json:
-                channelurl=c['channel']['channel_url'].encode('utf-8')
-                if 'live' in c['name']:
-                    if c.get('title'):
-                        title=c['title'].encode('utf-8')
-                    else:
-                        title='(no title)'
-                    out.append('%s %s' % (channelurl, title))
+            if json:
+                if not json.get('streams'):
+                    # got a response, but streams is empty; nothing live.
+                    irc.reply('No current live streams.')
+                    return
+            for c in json.get('streams'):
+                channel=c.get('channel')
+                channelurl=channel['url'].encode('utf-8')
+                title=channel.get('status','(no title)').encode('utf-8')
+                out.append('%s %s' % (channelurl, title))
         if out:
             irc.reply(' | '.join(out))
         else:
             irc.reply('No current live streams.')
-    jtvlive = wrap(jtvlive, [many('anything')])
+    twitchtvlive = wrap(twitchtvlive, [many('anything')])
 
     
     def livestreamlive(self, irc, msg, args, things):
