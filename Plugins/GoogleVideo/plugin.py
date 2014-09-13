@@ -45,18 +45,17 @@ class _Plugin(callbacks.Plugin):
         url=format("""http://ajax.googleapis.com/ajax/services/search/video?v=1.0&q=%s""",text)
         if debug==1:
             irc.reply('debug: %s' % url)
-        html = utils.web.getUrl(url)
+        html = utils.web.htmlToText(utils.web.getUrl(url))
         m = self._googlevRe.search(html)
         if m:
             title=m.group(1)
             duration=str(datetime.timedelta(seconds=int(m.group(3))))
-            link=utils.web.urlunquote( m.group(2).decode('unicode_escape')).split('&source')[0]
+            link=(m.group(2).encode())
+            link=link.decode('unicode_escape')
             link=str(link)
             s='%s (%s) %s' % (ircutils.bold(title), duration, link)
             s = utils.str.normalizeWhitespace(s)
-            s = s.decode('string_escape')
             s=s.replace('http://www.youtube.com/watch?v=','http://youtu.be/')
-
             irc.reply('%s' % s)
         else:
             if '{"results":[]' in html:
