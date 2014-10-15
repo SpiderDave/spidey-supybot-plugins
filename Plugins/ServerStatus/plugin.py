@@ -53,11 +53,21 @@ class _Plugin(callbacks.Plugin):
         except:
             irc.reply("Error: could not get a response from www.lolking.net")
             return
-        m = re.search(r'<span id="online_servers".*?>(.*?)</span>.*?<span id="offline_servers".*?>(.*?)</span>.*?fallback: \'(.*?)\'', html, re.I | re.S)
+        out = ''
+        m = re.search(r'<div class="server-status-online">Online: (.*?)</div>', html, re.I | re.S)
         if m:
-            irc.reply('%s %s | %s' % (m.group(1),m.group(3),m.group(2)))
-        else:
+            out = out + 'Online: %s' % m.group(1)
+        
+        m = re.search(r'<div class="server-status-offline">Offline: (.*?)</div>', html, re.I | re.S)
+        if m:
+            if out != '':
+                out = out + ' | '
+            out = out + 'Offline: %s' % m.group(1)
+        
+        if out=='':
             irc.reply("Error: could not get server status.")
+        else:
+            irc.reply(out)
     leagueoflegends = wrap(leagueoflegends)
 
 
