@@ -32,9 +32,12 @@ class _Plugin(callbacks.Plugin):
         t = utils.str.normalizeWhitespace(t)
         return t
     
-    _blastRe = re.compile(r'<url><!\[CDATA\[(.*?)\]\]></url>', re.I)
-    _blast_titleRe = re.compile(r'<title><!\[CDATA\[(.*?)\]\]></title>', re.I)
-    _blast_errorRe = re.compile(r'<error.*?>(.*?)</error>', re.I)    
+    _blast_resultsRe = re.compile(r'"moreResultsFollow":(.*?),', re.S | re.I)
+    _blastRe = re.compile(r'"results":.*?"title":"(.*?)".*?"url":"(.*?)"', re.S | re.I)
+    _blast_errorRe = re.compile(r'<error.*?>(.*?)</error>', re.I)
+    
+    #http://www.gigablast.com/api.html?c=main#/search
+    
     def blast(self, irc, msg, args, text):
         """<text>
         
@@ -44,23 +47,28 @@ class _Plugin(callbacks.Plugin):
             irc.reply("You have to search for something, silly.")
         else:
             text = utils.web.urlquote(text)
-            url = 'http://www.gigablast.com/search?q=%s&raw=9&n=1' % text
+            url = 'http://www.gigablast.com/search?c=main&q=%s&format=json&dsrt=0&n=1' % text
             s = utils.web.getUrl(url)
             err = self._blast_errorRe.search(s)
             if err:
                 irc.reply(utils.str.normalizeWhitespace(err.group(1)))
             else:
-                m = self._blastRe.search(s)
-                t = self._blast_titleRe.search(s)
+                m = self._blast_resultsRe.search(s)
                 if m:
-                    title = self.cleanup(t.group(1))
-                    result = self.cleanup(m.group(1))
-                    irc.reply('%s - %s' % (ircutils.bold(title), result))
+                    nResults = int(m.group(1))
+                    if nResults == 0:
+                        irc.reply('No results. :(')
+                    else:
+                        m = self._blastRe.search(s)
+                        if m:
+                            irc.reply('%s - %s' % (ircutils.bold(m.group(2)), m.group(1)))
+                        else:
+                            # results were found, but couldn't get the information; format may have changed
+                            irc.reply("""Fail :(""")
                 else:
+                    # couldn't find number of results, site could be unavailable
                     irc.reply("""Fail :(""")
     blast = wrap(blast, [('text')])
-
-
 
 _Plugin.__name__=PluginName
 Class = _Plugin
