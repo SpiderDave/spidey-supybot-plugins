@@ -21,7 +21,7 @@ class _Plugin(callbacks.Plugin):
 
     # **********************************************************************
     _transRe = re.compile(r"TRANSLATED_TEXT='(.*?)';",re.I)
-    _transdetectRe = re.compile(r'"detectedSourceLanguage":"(.*?)"', re.I)
+    _transdetectRe = re.compile(r'&sl=(.*?)&tl=.*?&q=.*?"', re.I)
     
 #    Examples:
 #    translate from english to french hello "bonjour"
@@ -33,12 +33,13 @@ class _Plugin(callbacks.Plugin):
 #    translate from en to fr hello "bonjour"
 #    translate from english to fr hello "bonjour"
 #    translate to fr hello (from english) "bonjour"
+#    translate en fr hello (from english) "bonjour"
 
 
     def translate(self, irc, msg, args, text):
-        """[<fromlanguage>] to <tolanguage> <text>
+        """[<fromlanguage>] [to] <tolanguage> <text>
 
-        Translates text using Google Translate.  More syntax examples here: http://pastebin.com/raw.php?i=GLDfz7F1
+        Translates text using Google Translate.  More syntax examples here: http://pastebin.com/raw.php?i=3yj4T1BM
         """
         text=text.split()
         
@@ -172,6 +173,11 @@ class _Plugin(callbacks.Plugin):
             fromlang=text[0].strip().lower()
             tolang=text[2].strip().lower()
             text=text[3:]
+        # translate _ _ text
+        elif _isvalidlanguage(text[0]) and _isvalidlanguage(text[1]):
+            fromlang=text[0].strip().lower()
+            tolang=text[1].strip().lower()
+            text=text[2:]
         # translate text
         # Just assume it's autodetect --> english
         else:
@@ -195,6 +201,7 @@ class _Plugin(callbacks.Plugin):
         tolang = tolang.replace('unknown', '')
         url= 'https://translate.google.com/?sl=%s&tl=%s&q=%s' % (fromlang.lower(),tolang.lower(), text)
         html = utils.web.getUrl(url)
+        
         m = self._transRe.search(html)
         if m:
             s = m.group(1)
