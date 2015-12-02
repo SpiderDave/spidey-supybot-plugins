@@ -1,8 +1,6 @@
 ###
 # Copyright (c) 2015, SpiderDave
 # All rights reserved.
-#
-#
 ###
 
 import re
@@ -36,6 +34,7 @@ class _Plugin(callbacks.Plugin):
         """
         show = text.lower().replace(" ","-")
         nextEpisode = False
+        nextEp = False
         status = False
         url= 'http://next-episode.net/' + utils.web.urlquote(show)
         try:
@@ -47,8 +46,9 @@ class _Plugin(callbacks.Plugin):
         m = self._reNext.search(html)
         if m:
             nextEp = utils.str.normalizeWhitespace(m.group(1)).strip()
-            season = int(m.group(2))
-            episodeNum = int(m.group(3))
+            season = m.group(2)
+            episodeNum = m.group(3)
+            episodeNum=episodeNum.split(',')
         m = self._reStatus.search(html)
         if m:
             status = utils.str.normalizeWhitespace(m.group(1)).strip()
@@ -56,7 +56,11 @@ class _Plugin(callbacks.Plugin):
             out = ""
             if status: out = out + "Status: %s" % status
             if status and nextEp: out = out + " | "
-            if nextEp: out = out + "Next Episode: s%02de%02d %s " % (season, episodeNum, nextEp)
+            if nextEp: 
+                out = out + "Next Episode: "
+                for i in range(0,len(episodeNum)):
+                    out = out + "s%02de%02d " % (int(season), int(episodeNum[i]))
+                out = out + " %s" % (nextEp)
             irc.reply(out)
         else:
             irc.reply("Error: could not get information for that series.")
