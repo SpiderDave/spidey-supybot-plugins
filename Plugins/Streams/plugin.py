@@ -36,8 +36,7 @@ except ImportError:
 # This will be used to change the name of the class to the folder name
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
 class _Plugin(callbacks.Plugin):
-    """Add the help for "@plugin help <Plugin Name>" here
-    This should describe *how* to use this plugin."""
+    """This plugin displays live channels from streaming sites."""
     threaded = True
     def twitchtvlive(self, irc, msg, args, things):
         """ <channel> [<channel> ...]
@@ -78,44 +77,7 @@ class _Plugin(callbacks.Plugin):
         else:
             irc.reply('No current live streams.')
     twitchtvlive = wrap(twitchtvlive, [many('anything')])
-
     
-    def livestreamlive(self, irc, msg, args, things):
-        """ <channel> [<channel> ...]
-        
-        Displays current live Livestream channels given a list.
-        """
-        channels=things
-        
-        headers = utils.web.defaultHeaders
-        islive=[]
-        out=[]
-
-
-        opts = {}
-        opts['channel']=','.join(channels)
-        
-        for c in channels:
-            searchurl = 'http://x%sx.api.channel.livestream.com/2.0/livestatus.json' % c.replace('_','-')
-            fd = utils.web.getUrlFd(searchurl, headers)
-
-            json = simplejson.load(fd)
-            fd.close()
-
-            if not json:
-                # Most likely no streams are live
-                pass
-            else:
-                if json['channel']:
-                    if json['channel']['isLive']:
-                        channelurl='http://www.livestream.com/%s' % c
-                        out.append('%s' % channelurl)
-        if out:
-            irc.reply(' | '.join(out))
-        else:
-            irc.reply('No current live streams.')
-    livestreamlive = wrap(livestreamlive, [many('anything')])
-
     def hitboxtvlive(self, irc, msg, args, things):
         """ <channel> [<channel> ...]
         
