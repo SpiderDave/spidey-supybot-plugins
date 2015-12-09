@@ -32,7 +32,7 @@ class _Plugin(callbacks.Plugin):
         return request.url
 
     def movie(self, irc, msg, args, opts, text):
-        """<film>
+        """[--language <language>] <film>
 
         Get information on <film> from TMDb
         """
@@ -51,6 +51,7 @@ class _Plugin(callbacks.Plugin):
             if k == 'language':
                 language=value
 
+        irc.reply(text)
         base_url = "https://api.themoviedb.org/3/search/movie"
         base_url2 = "https://api.themoviedb.org/3/movie/"
         try:
@@ -85,14 +86,14 @@ class _Plugin(callbacks.Plugin):
         if language:
             newUrl=self._get_redirected_url(newUrl) + '?language=' + language
 
-        text = ('%s (%s) %s/10 %s %s' % (res_title, res_date, res_avg, newUrl, res2_ov))
-        text = text.replace("\n", " ")  # results may contain new lines which need to be stripped
-        irc.reply(text)
+        out = ('%s (%s) %s/10 %s %s' % (res_title, res_date, res_avg, newUrl, res2_ov))
+        out = out.replace("\n", " ")  # results may contain new lines which need to be stripped
+        irc.reply(out)
         
     movie = wrap(movie, [getopts({'language':'somethingWithoutSpaces'}), 'text'])
 
     def tv(self, irc, msg, args, opts, text):
-        """<show>
+        """[--language <language>] <show>
 
         Get information on <show> from TMDb
         """
@@ -148,7 +149,7 @@ class _Plugin(callbacks.Plugin):
     tv = wrap(tv, [getopts({'language':'somethingWithoutSpaces'}), 'text'])
 
     def person(self, irc, msg, args, opts, text):
-        """<person>
+        """[--language <language>] <person>
 
         Get information on <person> from TMDb
         """
