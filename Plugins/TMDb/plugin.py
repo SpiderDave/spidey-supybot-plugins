@@ -190,32 +190,37 @@ class _Plugin(callbacks.Plugin):
             res2=utils.web.htmlToText(utils.web.getUrl(url))
             res2=json.loads(res2)
             res2_bio=res2['biography']
-            res2_aka=res2['also_known_as']
+            res2_name=res2['name']
+            res2_aka=res2['also_known_as'][0]
             res2_bd=res2['birthday']
             res2_dd=res2['deathday']
             res2_hp=res2['homepage']
             res2_bp=res2['place_of_birth']
         except:
             res2_bio="unable to obtain biographical data from website"
+            res2_name=""
             res2_aka=""
             res2_bd=""
             res2_dd=""
             res2_hp=""
             res2_bp=""
-        text = res_name
+        
+        text = res2_name
         if res2_aka: 
             text = ('%s AKA %s' % (text, res2_aka))
+        
         if res2_bd and res2_dd:
             text = ('%s (%s-%s)' % (text, res2_bd, res2_dd))
         elif res2_bd:
             text = ('%s (%s- )' % (text, res2_bd))
+        
         if res2_bp:
             text = ('%s %s' % (text, res2_bp))
 
         newUrl='http://www.themoviedb.org/person/%s' % (res_id)
         if language:
             newUrl=self._get_redirected_url(newUrl) + '?language=' + language
-
+        
         text = ('%s %s' % (text, newUrl))
         if res2_hp:
             text = ('%s Homepage %s' % (text, res2_hp))
