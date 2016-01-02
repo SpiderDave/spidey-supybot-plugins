@@ -56,6 +56,7 @@ class _Plugin(callbacks.Plugin):
             s='%s (%s) %s' % (ircutils.bold(title), duration, link)
             s = utils.str.normalizeWhitespace(s)
             s=s.replace('http://www.youtube.com/watch?v=','http://youtu.be/')
+            s=s.replace('https://www.youtube.com/watch?v=','https://youtu.be/')
             irc.reply('%s' % s)
         else:
             if '{"results":[]' in html:
