@@ -10,7 +10,14 @@ import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import os
 import json
-import urllib2
+
+try:
+    # Python 3
+    import urllib.request as urllib2
+except ImportError:
+    # Python 2
+    import urllib2
+
 try:
     from supybot.i18n import PluginInternationalization, internationalizeDocstring
 except:
@@ -51,7 +58,6 @@ class _Plugin(callbacks.Plugin):
             if k == 'language':
                 language=value
 
-        irc.reply(text)
         base_url = "https://api.themoviedb.org/3/search/movie"
         base_url2 = "https://api.themoviedb.org/3/movie/"
         try:
