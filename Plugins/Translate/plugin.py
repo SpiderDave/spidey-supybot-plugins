@@ -200,7 +200,7 @@ class _Plugin(callbacks.Plugin):
         fromlang = fromlang.replace('unknown', '')
         tolang = tolang.replace('unknown', '')
         url= 'https://translate.google.com/?sl=%s&tl=%s&q=%s' % (fromlang.lower(),tolang.lower(), text)
-        html = utils.web.getUrl(url)
+        html = utils.web.getUrl(url).decode()
         
         m = self._transRe.search(html)
         if m:
