@@ -174,7 +174,7 @@ class _Plugin(callbacks.Plugin):
             tolang=text[2].strip().lower()
             text=text[3:]
         # translate _ _ text
-        elif _isvalidlanguage(text[0]) and _isvalidlanguage(text[1]):
+        elif _isvalidlanguage(text[0]) and _isvalidlanguage(text[1]) and (len(text)>=3):
             fromlang=text[0].strip().lower()
             tolang=text[1].strip().lower()
             text=text[2:]
@@ -183,12 +183,11 @@ class _Plugin(callbacks.Plugin):
         else:
             fromlang=''
             tolang='en'
-        
         # Somewhere along the way, we got invalid languages.  Best to just assume autodetect again.
         if not _isvalidlanguage(fromlang) or not _isvalidlanguage(tolang):
             fromlang=''
             tolang='en'
-        
+
         text=' '.join(text)
         text = utils.web.urlquote(text)
 
@@ -200,7 +199,7 @@ class _Plugin(callbacks.Plugin):
         fromlang = fromlang.replace('unknown', '')
         tolang = tolang.replace('unknown', '')
         url= 'https://translate.google.com/?sl=%s&tl=%s&q=%s' % (fromlang.lower(),tolang.lower(), text)
-        html = utils.web.getUrl(url).decode()
+        html = utils.web.getUrl(url).decode('utf8')
         
         m = self._transRe.search(html)
         if m:
