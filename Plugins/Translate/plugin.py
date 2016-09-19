@@ -10,7 +10,7 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
-import os, urllib, urllib2, re
+import os, re
 
 # This will be used to change the name of the class to the folder name
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
@@ -200,7 +200,7 @@ class _Plugin(callbacks.Plugin):
         fromlang = fromlang.replace('unknown', '')
         tolang = tolang.replace('unknown', '')
         url= 'https://translate.google.com/?sl=%s&tl=%s&q=%s' % (fromlang.lower(),tolang.lower(), text)
-        html = utils.web.getUrl(url)
+        html = utils.web.getUrl(url).decode()
         
         m = self._transRe.search(html)
         if m:
@@ -216,7 +216,7 @@ class _Plugin(callbacks.Plugin):
                         detectedlanguage=key.capitalize()
                         break
                   s='(from ' + detectedlanguage+") "+s
-            s=s.replace("\u0026", "&")
+            s=s.replace("\\u0026", "&")
             s=s.replace(r'\x26#39;',"'")
             s=s.replace(r'\x26gt;',">")
             s=s.replace(r'\x26lt;',"<")
