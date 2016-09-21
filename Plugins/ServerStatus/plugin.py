@@ -47,9 +47,8 @@ class _Plugin(callbacks.Plugin):
         """
         Get League of Legends server status from www.lolking.net
         """
-        # We're just grabbing status from the header here.  The /about.php page uses the old header, and it's small.  It'll break at some point, we'll fix it then (if someone tells me).
-        url = 'http://www.lolking.net/about.php'
-        html = utils.web.getUrl(url)
+        # We're just grabbing status from the header here.
+        url = 'http://www.lolking.net/about'
         try:
             html = utils.web.getUrl(url)
         except:
