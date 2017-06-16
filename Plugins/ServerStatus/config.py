@@ -29,9 +29,8 @@ def configure(advanced):
 P = conf.registerPlugin(PluginName)
 P.__name__ = PluginName
 
-# This is where your configuration variables (if any) should go.  For example:
-# conf.registerGlobalValue(PluginName, 'someConfigVariableName',
-#     registry.Boolean(False, """Help for someConfigVariableName."""))
-
+conf.registerGlobalValue(P, 'riotAPIKey', registry.String('', ("""Your riot API key."""), private=True))
+conf.registerGlobalValue(P, 'lolValidRegions', registry.String('RU KR PBE1 BR1 OC1 JP1 NA1 EUN1 EUW1 TR1 LA1 LA2', ("""Valid Regions for LoL.""")))
+conf.registerGlobalValue(P, 'lolDefaultRegion', registry.String('NA1', ("""Default Region for LoL.""")))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
