@@ -1,0 +1,39 @@
+--
+-- Database: `botgames`
+--
+CREATE DATABASE IF NOT EXISTS `botgames` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `botgames`;
+
+CREATE TABLE IF NOT EXISTS `werewolf` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userid` int(10) DEFAULT NULL,
+  `nick` varchar(30) DEFAULT NULL,
+  `points` int(11) DEFAULT NULL,
+  `gamesplayed` int(11) DEFAULT NULL,
+  `lastgame` datetime DEFAULT NULL,
+  `channel` varchar(30) DEFAULT NULL,
+  `season` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+CREATE TABLE IF NOT EXISTS `gamekeys` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `userid` int(4) NOT NULL,
+  `gamekey` varchar(65) NOT NULL,
+  `type` varchar(65) NOT NULL,
+  `added` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+CREATE TABLE IF NOT EXISTS `configuration` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `type` varchar(50) NOT NULL COMMENT 'The name of the game or section that uses this setting.',
+  `name` varchar(150) NOT NULL COMMENT 'The name of the setting.',
+  `value` longtext NOT NULL COMMENT 'The current value of the setting.',
+  `description` text NOT NULL COMMENT 'A brief description of this setting.',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 COMMENT='A configuration table, mapping global configuration options to their values.';
+
+INSERT INTO `configuration` (`id`, `type`, `name`, `value`, `description`) VALUES
+(1, 'werewolf', 'channel', 'werewolf', 'The channel to display stats from.'),
+(2, 'werewolf', 'season', '1', 'The current season to display stats from.');

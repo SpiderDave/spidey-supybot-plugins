@@ -1,0 +1,12 @@
+# The season that this game will be recorded under, for scoreboard purposes.
+season=1
+
+# The url for the scoreboard
+score_url='http://www.example.com/werewolf/'
+
+# database settings
+
+host = "localhost"
+user = "root"
+password = ""
+database = "botgames"
