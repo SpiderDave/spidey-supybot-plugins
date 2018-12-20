@@ -38,7 +38,7 @@ class _Plugin(callbacks.Plugin):
         status = False
         url= 'http://next-episode.net/' + utils.web.urlquote(show)
         try:
-            html = utils.web.getUrl(url)
+            html = utils.web.getUrl(url).decode("utf-8")
         except:
             #404
             irc.reply("Series not found.")
