@@ -28,13 +28,13 @@ class _Plugin(callbacks.Plugin):
         slapFile='%s%sslap.txt' % (conf.supybot.directories.data(), os.sep)
         if not os.path.isfile(slapFile):
             try:
-                f = open(slapFile, 'wb')
+                f = open(slapFile, 'w')
                 f.write("a large trout" + "\n")
                 f.close()
             except:
                 irc.reply('Error: could not create slap.txt file in the data folder.')
                 return
-        f = open(slapFile, 'rb')
+        f = open(slapFile, 'r')
         l=f.readlines()
         f.close()
         t=random.choice(l)
@@ -43,7 +43,7 @@ class _Plugin(callbacks.Plugin):
             stuff="someone"
         if (stuff.lower() == irc.nick.lower()) or (stuff.lower() == 'yourself'):
             try:
-                fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'rb')
+                fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'r')
                 gender=fmeta.read().split('gender=')[1].splitlines()[0].strip().lower()
                 fmeta.close()
                 if gender=='male':
@@ -59,7 +59,7 @@ class _Plugin(callbacks.Plugin):
         if stuff.split(' ',1)[0].lower()=="--add" or stuff.split(' ',1)[0].lower()=="add":
             try:
                  stuff=stuff.split(' ',1)[1]
-                 f = open(slapFile, 'ab')
+                 f = open(slapFile, 'a')
                  f.write(stuff + "\n")
                  f.close()
                  irc.reply(format("puts %s away for a special occasion.  (#%s)",stuff, str(len(l)+1) ), action=True)
@@ -92,7 +92,7 @@ class _Plugin(callbacks.Plugin):
             if stuff not in self.validgenders:
                 irc.error('Error: valid genders are ' + '/'.join(self.validgenders) + '.')
                 return
-            fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'wb') #wipes file
+            fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'w') #wipes file
             fmeta.write('gender=' + stuff + "\n")
             fmeta.close()
             irc.reply("Gender set to %s" % stuff)
@@ -109,14 +109,14 @@ class _Plugin(callbacks.Plugin):
         attackFile='%s%sattack.txt' % (conf.supybot.directories.data(), os.sep)
         if not os.path.isfile(attackFile):
             try:
-                f = open(attackFile, 'wb')
+                f = open(attackFile, 'w')
                 f.write("hits _ in the shins with an oversized ruler" + "\n")
                 f.close()
             except:
                 irc.reply('Error: could not create attack.txt file in the data folder.')
                 return
         
-        f = open(attackFile, 'rb')
+        f = open(attackFile, 'r')
         l=f.readlines()
         f.close()
         t=random.choice(l)
@@ -125,7 +125,7 @@ class _Plugin(callbacks.Plugin):
             stuff="someone"
         if (stuff.lower() == irc.nick.lower()) or (stuff.lower() == 'yourself'):
             try:
-                fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'rb')
+                fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'r')
                 gender=fmeta.read().split('gender=')[1].splitlines()[0].strip().lower()
                 if gender=='male':
                     stuff="himself"
@@ -146,7 +146,7 @@ class _Plugin(callbacks.Plugin):
                      return
                  if t.endswith('.'):
                     t=t[:-1]
-                 f = open(attackFile, "ab")
+                 f = open(attackFile, "a")
                  f.write(t + "\n")
                  f.close()
                  irc.reply(format("Attack #%s added.",str(len(l)+1) ))
@@ -174,7 +174,7 @@ class _Plugin(callbacks.Plugin):
             if stuff not in self.validgenders:
                 irc.error('Error: valid genders are ' + '/'.join(self.validgenders) + '.')
                 return
-            fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'wb') #wipes file
+            fmeta=open('%s%sbot_meta.txt' % (conf.supybot.directories.data(),os.sep) , 'w') #wipes file
             fmeta.write('gender=' + stuff + "\n")
             fmeta.close()
             irc.reply("Gender set to %s" % stuff)
