@@ -1,1 +1,0 @@
-Display next episode information from http://next-episode.net/

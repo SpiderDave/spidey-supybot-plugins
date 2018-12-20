@@ -1,16 +1,17 @@
 ###
-# Copyright (c) 2015, SpiderDave
-# All rights reserved.
+# by SpiderDave
 ###
 
 import re
-
 import supybot.utils as utils
 from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import os
+#import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
+
 try:
     from supybot.i18n import PluginInternationalization, internationalizeDocstring
 except:
@@ -22,9 +23,34 @@ PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
 _ = PluginInternationalization(PluginName)
 @internationalizeDocstring
 class _Plugin(callbacks.Plugin):
-    """Add the help for "@plugin help <Plugin Name>" here
-    """
+    """Contains commands for checking the status of tv shows."""
     threaded = True
+    def ismyshowcancelled(self, irc, msg, args, text):
+        """
+        find the status of a tv show from http://www.ismyshowcancelled.com
+        """
+        
+        post_url = 'http://www.ismyshowcancelled.com/shows/search/page/1/'
+        headers = {}
+        headers['Content-Type'] = 'application/json'
+        
+        post_data = urllib.parse.urlencode({'Search': text}).encode('utf-8')
+        
+        post_response = urllib.request.urlopen(url=post_url, data=post_data)
+
+        html = post_response.read()
+        
+        m = re.search(b'<div class="pg-title-bar"><h2>(.*?)</h2></div>.*?<div class="status"><span.*?>(.*?)</span></div>', html, re.I | re.S)
+        m2 = re.search(b"<div><h3>(.*?)</h3><span.*?>(.*?)</span></div>", html, re.I | re.S)
+        if m:
+            text='%s : %s' % (m.group(1).decode("utf-8"),m.group(2).decode("utf-8"))
+            irc.reply(text)
+        elif m2:
+            text='%s : %s' % (m2.group(1).decode("utf-8"),m2.group(2).decode("utf-8"))
+            irc.reply(text)
+        else:
+            irc.reply('Error: Show not found.')
+    ismyshowcancelled = wrap(ismyshowcancelled, ['text'])
     
     _reNext = re.compile(r'<div id="next_episode".*?>.*?<div class="subheadline"><h3>Date:</h3></div>(.*?)<div></div>.*?Season:</h3></div>(.*?)<div></div>.*?Episode:</div><div.*?>(.*?)</div></div>', re.I | re.S)
     _reStatus = re.compile(r'<div id="middle_section".*?>.*?<div class="subheadline"><h3>Status:</h3></div>(.*?)<div></div>', re.I | re.S)
