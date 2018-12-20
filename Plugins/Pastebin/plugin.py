@@ -9,7 +9,8 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import os
-import urllib, urllib2
+#import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 from time import gmtime, strftime
 
 # documentation from: http://pastebin.com/api
@@ -65,9 +66,9 @@ class _Plugin(callbacks.Plugin):
                   'api_dev_key': api_key
                   }
         
-        data = urllib.urlencode(values)
-        req = urllib2.Request(api_url, data)
-        response = urllib2.urlopen(req)
+        data = urllib.parse.urlencode(values).encode('utf-8') 
+        req = urllib.request.Request(api_url, data)
+        response = urllib.request.urlopen(req)
         the_page = response.read()
         
         # print return data or url
