@@ -8,7 +8,10 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import os
-from HTMLParser import HTMLParser
+#from HTMLParser import HTMLParser
+#from future.moves.html.parser import HTMLParser
+from html.parser import HTMLParser
+
 try:
     from supybot.i18n import PluginInternationalization, internationalizeDocstring
 except:
@@ -37,16 +40,16 @@ class _Plugin(callbacks.Plugin):
         video game information on <game> from http://www.arcade-museum.com
         """
         text = utils.web.urlquote(text)
-        url = format("""http://www.arcade-museum.com/results.php?boolean=AND&type=Videogame&q=%s""", text)
+        url = format('http://www.arcade-museum.com/results.php?boolean=AND&type=Videogame&q=%s', text)
         html = utils.web.getUrl(url)
-        notfound = re.search("""Number of Search Results: 0""", html, re.I | re.S)
+        notfound = re.search(b'Number of Search Results: 0', html, re.I | re.S)
         if notfound:
             irc.reply('Not found')
             self.log.info(url)
         else:
-            m = re.search("""<TH>Name</TH>.*?<A HREF="game_detail.php\?game_id=(.*?)">(.*?)</A></TD><TD>(.*?)</TD><TD>(.*?)</TD>""", html, re.I | re.S)
+            m = re.search(b'<TH>Name</TH>.*?<A HREF="game_detail.php\?game_id=(.*?)">(.*?)</A></TD><TD>(.*?)</TD><TD>(.*?)</TD>', html, re.I | re.S)
             if m:
-                s = ircutils.bold(utils.str.normalizeWhitespace(m.group(2))) + " // "+utils.str.normalizeWhitespace(m.group(3)) + " // " +utils.str.normalizeWhitespace(m.group(4)) + " // " + "http://www.arcade-museum.com/game_detail.php?game_id=" +utils.str.normalizeWhitespace(m.group(1))
+                s = ircutils.bold(utils.str.normalizeWhitespace(m.group(2).decode('ASCII'))) + " // "+utils.str.normalizeWhitespace(m.group(3).decode('ASCII')) + " // " +utils.str.normalizeWhitespace(m.group(4).decode('ASCII')) + " // " + "http://www.arcade-museum.com/game_detail.php?game_id=" +utils.str.normalizeWhitespace(m.group(1).decode('ASCII'))
                 s = self._strip_tags(s)
                 irc.reply(s)
             else:
@@ -56,6 +59,3 @@ class _Plugin(callbacks.Plugin):
 
 _Plugin.__name__=PluginName
 Class = _Plugin
-
-
-# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
