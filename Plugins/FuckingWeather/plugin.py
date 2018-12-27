@@ -3,6 +3,7 @@ from supybot.commands import *
 import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
+import math
 import os
 try:
     from supybot.i18n import PluginInternationalization, internationalizeDocstring
@@ -35,8 +36,9 @@ class _Plugin(callbacks.Privmsg):
             remark = [element.text for element in soup.find_all("p", {'class': 'remark'})][0]
             flavor = [element.text for element in soup.find_all("p", {'class': 'flavor'})][0]
             location = [element.text for element in soup.find_all("span", {'id': 'locationDisplay'})][0]
+            celsius = math.floor((int(temperature)-32)*5/9)
             
-            res = "%s\u00B0 in %s?! %s.  %s." % (temperature, location, remark, flavor)
+            res = "%s\u00B0F / %s\u00B0C in %s?! %s.  %s." % (temperature,celsius, location, remark, flavor)
             irc.reply(res, prefixNick=True)
         except:
             irc.reply("ERROR, FUCKING BROKEN.", prefixNick=True)
