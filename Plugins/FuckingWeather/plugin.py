@@ -36,7 +36,7 @@ class _Plugin(callbacks.Privmsg):
             flavor = [element.text for element in soup.find_all("p", {'class': 'flavor'})][0]
             location = [element.text for element in soup.find_all("span", {'id': 'locationDisplay'})][0]
             
-            res = "%s\u00B0 in %s? %s.  %s." % (temperature, location, remark, flavor)
+            res = "%s\u00B0 in %s?! %s.  %s." % (temperature, location, remark, flavor)
             irc.reply(res, prefixNick=True)
         except:
             irc.reply("ERROR, FUCKING BROKEN.", prefixNick=True)
