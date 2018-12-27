@@ -1,0 +1,1 @@
+Displays the weather from http://www.thefuckingweather.com/
