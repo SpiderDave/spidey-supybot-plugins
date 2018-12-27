@@ -28,20 +28,20 @@ class _Plugin(callbacks.Privmsg):
         """
         <zip code>: Displays the weather from http://www.thefuckingweather.com/
         """
-        url = 'http://www.thefuckingweather.com/Where/%s' % text
+        url = 'http://www.thefuckingweather.com/Where/%s' % utils.web.urlquote(text)
         try:
             soup = BeautifulSoup(utils.web.getUrl(url))
             
-            temperature = [element.text for element in soup.find_all("span", {'class': 'temperature jsMainTemp'})][0]
-            remark = [element.text for element in soup.find_all("p", {'class': 'remark'})][0]
-            flavor = [element.text for element in soup.find_all("p", {'class': 'flavor'})][0]
-            location = [element.text for element in soup.find_all("span", {'id': 'locationDisplay'})][0]
+            temperature = soup.body('span', {'class': 'temperature'}, limit=1)[0].text
+            remark = soup.body('p',{'class':'remark'}, limit=1)[0].text
+            flavor = soup.body('p',{'class':'flavor'}, limit=1)[0].text
+            location = soup.body('span',{'id':'locationDisplay'}, limit=1)[0].text
             celsius = math.floor((int(temperature)-32)*5/9)
             
-            res = "%s\u00B0F / %s\u00B0C in %s?! %s.  %s." % (temperature,celsius, location, remark, flavor)
+            res = "%s\u00B0F / %s\u00B0C in %s?! %s.  %s." % (temperature, celsius, location, remark, flavor)
             irc.reply(res, prefixNick=True)
         except:
-            irc.reply("ERROR, FUCKING BROKEN.", prefixNick=True)
+            irc.reply("ERROR: IT'S FUCKING BROKEN.", prefixNick=True)
 
     fuckingweather = wrap(fuckingweather, ['text'])
 
