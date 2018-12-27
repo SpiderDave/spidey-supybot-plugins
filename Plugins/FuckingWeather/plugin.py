@@ -32,10 +32,13 @@ class _Plugin(callbacks.Privmsg):
         try:
             soup = BeautifulSoup(utils.web.getUrl(url))
             
-            temperature = soup.body('span', {'class': 'temperature'}, limit=1)[0].text
-            remark = soup.body('p',{'class':'remark'}, limit=1)[0].text
-            flavor = soup.body('p',{'class':'flavor'}, limit=1)[0].text
-            location = soup.body('span',{'id':'locationDisplay'}, limit=1)[0].text
+            find=lambda x,y:soup.body(x,y,limit=1)[0].text
+            
+            temperature = find('span', {'class':'temperature'})
+            remark = find('p',{'class':'remark'})
+            flavor = find('p',{'class':'flavor'})
+            location = find('span',{'id':'locationDisplay'})
+            
             celsius = math.floor((int(temperature)-32)*5/9)
             
             res = "%s\u00B0F / %s\u00B0C in %s?! %s.  %s." % (temperature, celsius, location, remark, flavor)
