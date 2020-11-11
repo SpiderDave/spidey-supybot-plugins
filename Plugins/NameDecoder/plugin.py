@@ -42,7 +42,7 @@ class NameDecoder(callbacks.Plugin):
     def callCommand(self, command, irc, msg, *args, **kwargs):
         try:
             super(NameDecoder, self).callCommand(command,irc,msg,*args,**kwargs)
-        except utils.web.Error, e:
+        except utils.web.Error as e:
             irc.error(str(e))
 
     _cyborgRe = re.compile(r'<div class="mediumheader">(.*?)</div>', re.I)
@@ -57,7 +57,7 @@ class NameDecoder(callbacks.Plugin):
         name = utils.web.urlquote(name)
         # url = 'http://www.NameDecoder.com/cyborger.cgi?acronym=' + name
         url= 'http://cyborg.namedecoder.com/index.php?acronym=' + name
-        html = utils.web.getUrl(url)
+        html = utils.web.getUrl(url).decode('utf-8')
         m = self._cyborgRe.search(html)
         if m:
             s = m.group(1)
@@ -78,7 +78,7 @@ class NameDecoder(callbacks.Plugin):
             name = msg.nick
         name = utils.web.urlquote(name)
         url= 'http://monster.namedecoder.com/index.php?acronym=' + name
-        html = utils.web.getUrl(url)
+        html = utils.web.getUrl(url).decode('utf-8')
         m = self._monsterRe.search(html)
         if m:
             s = m.group(1)
@@ -112,7 +112,7 @@ class NameDecoder(callbacks.Plugin):
             name = msg.nick
         name = utils.web.urlquote(name)
         url= 'http://sexy.namedecoder.com/index.php?acronym={0}&otherflag={1}'.format(name,gender)
-        html = utils.web.getUrl(url)
+        html = utils.web.getUrl(url).decode('utf-8')
         m = self._sexyRe.search(html)
         if m:
             s = m.group(1)
