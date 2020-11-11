@@ -19,6 +19,9 @@ __author__ = "SpiderDave"
 # contributions.
 __contributors__ = {}
 
+# This is a url where the most recent plugin package can be downloaded.
+__url__ = 'https://github.com/SpiderDave/spidey-supybot-plugins'
+
 from . import config
 from . import plugin
 from imp import reload
