@@ -41,8 +41,13 @@ class Geo(callbacks.Plugin):
         Geolocation of an ip or host.
         """
         if stuff.lower()=='update':
+
+            if not self.registryValue('licenseKey'):
+                irc.reply('Error: licenseKey not set.')
+                return
+
             irc.reply('Updating data file...')
-            self.update()
+            self.update(irc)
             irc.reply('Update finished.')
             
             return
@@ -53,7 +58,7 @@ class Geo(callbacks.Plugin):
         except:
             irc.reply("Error:  GeoLite2-City database not found, attempting to update...")
             try:
-                self.update()
+                self.update(irc)
                 irc.reply('Update finished.')
             except:
                 irc.reply("Update failed.")
@@ -69,7 +74,7 @@ class Geo(callbacks.Plugin):
             irc.reply('%s, %s, %s' % (res.city.name, res.subdivisions.most_specific.name, res.country.name ))
     geo = wrap(geo, ['text'])
 
-    def update(self):
+    def update(self, irc):
         """update the geo files"""
         now=int(time.time())
         try:
@@ -86,12 +91,16 @@ class Geo(callbacks.Plugin):
         if 1==1:
             self.setRegistryValue('datalastupdated', now)
             self.log.info("Starting update of Geo data files...")
-            self.getfile()
+            self.getfile(irc)
         return
         
-    def getfile(self):
+    def getfile(self, irc):
         """grabs the data file"""
-        u='https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz'
+        
+        licenseKey = self.registryValue('licenseKey')
+        
+        u = 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=%s&suffix=tar.gz' % licenseKey
+        
         f = '%s%sgeo%sGeoLite2-City.tar.gz' % (conf.supybot.directories.data(), os.sep, os.sep)
         f2 = '%s%sgeo%sGeoLite2-City.tar' % (conf.supybot.directories.data(), os.sep, os.sep)
         

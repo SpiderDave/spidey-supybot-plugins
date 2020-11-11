@@ -21,5 +21,7 @@ def configure(advanced):
 Geo = conf.registerPlugin('Geo')
 conf.registerGlobalValue(Geo, 'datalastupdated',
     registry.PositiveInteger(1, """An integer representing the time since epoch the .dat file was last updated."""))
+conf.registerGlobalValue(P, 'licenseKey', registry.String('', ("""Your GeoLite2 license key."""), private=True))
+
 
 # vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
