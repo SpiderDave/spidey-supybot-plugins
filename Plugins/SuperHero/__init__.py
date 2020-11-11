@@ -10,6 +10,7 @@ Add a description of the plugin (to be presented to the user inside the wizard)
 here.  This should describe *what* the plugin does.
 """
 
+from importlib import reload
 import supybot
 import supybot.world as world
 
@@ -27,14 +28,14 @@ __contributors__ = {}
 # This is a url where the most recent plugin package can be downloaded.
 __url__ = '' # 'http://supybot.com/Members/yourname/SuperHero/download'
 
-import config
-import plugin
+from . import config
+from . import plugin
 reload(plugin) # In case we're being reloaded.
 # Add more reloads here if you add third-party modules and want them to be
 # reloaded when this plugin is reloaded.  Don't forget to import them as well!
 
 if world.testing:
-    import test
+    from . import test
 
 Class = plugin.Class
 configure = config.configure

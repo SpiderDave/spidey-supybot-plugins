@@ -15,6 +15,8 @@ PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
 class _Plugin(callbacks.Plugin):
     """This plugin generates a random superhero description for the given nick."""
     threaded = True
+    plugin_path=os.path.dirname( __file__ ) + os.sep
+    data_path=plugin_path + 'data' + os.sep
     # **********************************************************************
     # Note: the superhero text is saved in a text file so that each nick gives 
     # the same unique power.  I think it's more fun this way.
@@ -45,15 +47,15 @@ class _Plugin(callbacks.Plugin):
             irc.reply('error :(')
             return
 
-        power=[t.split(':',1)[1] for t in superhero if t.lower().startswith('%s:' % (name.lower()))]
+        power=[t.decode('utf-8').split(':',1)[1] for t in superhero if t.decode('utf-8').lower().startswith('%s:' % (name.lower()))]
         if power:
             power=power[0].strip().replace('_name_',name)
             irc.reply('%s' % power, prefixNick=False)
         else:
             url = 'http://www.rps.net/cgi-bin/stone/randpower.pl?sex=0&weakness=0&numpowers=2&name=_name_'
-            html = utils.web.getUrl(url)
+            html = utils.web.getUrl(url).decode('utf-8')
             txt=html.split('<H1>Random Superhero Generator!</H1>',1)[1].split('<P>',1)[0].strip()
-            f.write('%s:%s\n' % (name, txt))
+            f.write(('%s:%s\n' % (name, txt)).encode('utf-8'))
             irc.reply(txt.replace('_name_',name), prefixNick=False)
         f.close()
     superhero = wrap(superhero, [additional('somethingWithoutSpaces')])
