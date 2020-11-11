@@ -36,8 +36,12 @@ class _Plugin(callbacks.Plugin):
         
         post_data = urllib.parse.urlencode({'Search': text}).encode('utf-8')
         
-        post_response = urllib.request.urlopen(url=post_url, data=post_data)
-
+        try:
+            post_response = urllib.request.urlopen(url=post_url, data=post_data)
+        except:
+            irc.reply('Error: Could not get information.')
+            return
+        
         html = post_response.read()
         
         m = re.search(b'<div class="pg-title-bar"><h2>(.*?)</h2></div>.*?<div class="status"><span.*?>(.*?)</span></div>', html, re.I | re.S)
