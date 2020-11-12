@@ -10,28 +10,7 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import os
-
-simplejson = None
-
-try:
-    simplejson = utils.python.universalImport('json')
-except ImportError:
-    pass
-
-try:
-    # The 3rd party simplejson module was included in Python 2.6 and renamed to
-    # json.  Unfortunately, this conflicts with the 3rd party json module.
-    # Luckily, the 3rd party json module has a different interface so we test
-    # to make sure we aren't using it.
-    if simplejson is None or hasattr(simplejson, 'read'):
-        simplejson = utils.python.universalImport('simplejson',
-                                                  'local.simplejson')
-except ImportError:
-    raise callbacks.Error, \
-            'You need Python2.6 or the simplejson module installed to use ' \
-            'this plugin.  Download the module at ' \
-            '<http://undefined.org/python/#simplejson>.'
-
+import json
 
 # This will be used to change the name of the class to the folder name
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
@@ -97,17 +76,17 @@ class _Plugin(callbacks.Plugin):
             searchurl = 'https://www.smashcast.tv/api/media/live/%s/showHidden=true' % c
             try:
                 fd = utils.web.getUrlFd(searchurl, headers)
-                json = simplejson.load(fd)
+                jsonData = json.load(fd)
                 fd.close()
             except:
                 # Probably not a valid user
-                json=None
+                jsonData=None
                 pass
 
-            if not json:
+            if not jsonData:
                 pass
             else:
-                live=json['livestream'][0]['media_is_live']
+                live=jsonData['livestream'][0]['media_is_live']
                 if live == '1':
                     channelurl='http://www.smashcast.tv/%s' % c
                     out.append('%s' % channelurl)
