@@ -34,7 +34,7 @@ class _Plugin(callbacks.Plugin):
             irc.reply('Error: Pastebin API key must be set. See plugins.pastebinAPIkey value.')
             return
         
-        api_url = 'http://pastebin.com/api/api_post.php'
+        api_url = 'https://pastebin.com/api/api_post.php'
         
         # default args.
         visibility = self.registryValue('visibility').lower()
@@ -69,7 +69,7 @@ class _Plugin(callbacks.Plugin):
         data = urllib.parse.urlencode(values).encode('utf-8') 
         req = urllib.request.Request(api_url, data)
         response = urllib.request.urlopen(req)
-        the_page = response.read()
+        the_page = response.read().decode('utf-8')
         
         # print return data or url
         irc.reply(the_page)
