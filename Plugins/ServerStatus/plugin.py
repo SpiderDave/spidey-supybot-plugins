@@ -15,26 +15,7 @@ try:
 except:
     PluginInternationalization, internationalizeDocstring = lambda x:x, lambda x:x
 
-
-try:
-    simplejson = utils.python.universalImport('json')
-except ImportError:
-    pass
-
-try:
-    # The 3rd party simplejson module was included in Python 2.6 and renamed to
-    # json.  Unfortunately, this conflicts with the 3rd party json module.
-    # Luckily, the 3rd party json module has a different interface so we test
-    # to make sure we aren't using it.
-    if simplejson is None or hasattr(simplejson, 'read'):
-        simplejson = utils.python.universalImport('simplejson',
-                                                  'local.simplejson')
-except ImportError:
-    raise callbacks.Error, \
-            'You need Python2.6 or the simplejson module installed to use ' \
-            'this plugin.  Download the module at ' \
-            '<http://undefined.org/python/#simplejson>.'
-
+import json
 
 # This will be used to change the name of the class to the folder name
 PluginName=os.path.dirname( __file__ ).split(os.sep)[-1]
@@ -79,7 +60,7 @@ class _Plugin(callbacks.Plugin):
         defaultRegion = self.registryValue('lolDefaultRegion')
         
         if api_key == '':
-            irc.error('Missing Riot API key.  Please set plugins.riotAPIKey.')
+            irc.error('Missing Riot API key.  Please set plugins.%s.riotAPIKey.' % PluginName)
             return
         if validRegions == '':
             # Should be something like this: RU KR PBE1 BR1 OC1 JP1 NA1 EUN1 EUW1 TR1 LA1 LA2
@@ -102,26 +83,26 @@ class _Plugin(callbacks.Plugin):
         opts = {}
         opts['api_key']=api_key
         fd = utils.web.getUrlFd('%s?%s' % (url,
-                                           urllib.urlencode(opts)),
+                                           urllib.parse.urlencode(opts)),
                                 headers)
         
-        json = simplejson.load(fd)
+        jsonData = json.load(fd)
         fd.close()
         
         out = ''
         
-        if not json:
+        if not jsonData:
             irc.error('Could not get data.')
             return
         else:
-            if json:
-                if not json.get('services'):
+            if jsonData:
+                if not jsonData.get('services'):
                     # got a response, but services is empty.
                     irc.error('Could not get data.')
                     return
-            for c in json.get('services'):
+            for c in jsonData.get('services'):
                 if c.get('slug') == 'game':
-                    out = '%s: %s' % (json.get('name'), c.get('status'))
+                    out = '%s: %s' % (jsonData.get('name'), c.get('status'))
         if out:
             irc.reply(out)
         else:
