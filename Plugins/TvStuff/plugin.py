@@ -30,19 +30,15 @@ class _Plugin(callbacks.Plugin):
         find the status of a tv show from http://www.ismyshowcancelled.com
         """
         
-        post_url = 'http://www.ismyshowcancelled.com/shows/search/page/1/'
-        headers = {}
-        headers['Content-Type'] = 'application/json'
-        
-        post_data = urllib.parse.urlencode({'Search': text}).encode('utf-8')
+        url = 'http://www.ismyshowcancelled.com/shows/search/page/1/?' + urllib.parse.urlencode({'Search': text})
         
         try:
-            post_response = urllib.request.urlopen(url=post_url, data=post_data)
+            response = urllib.request.urlopen(url)
         except:
             irc.reply('Error: Could not get information.')
             return
         
-        html = post_response.read()
+        html = response.read()
         
         m = re.search(b'<div class="pg-title-bar"><h2>(.*?)</h2></div>.*?<div class="status"><span.*?>(.*?)</span></div>', html, re.I | re.S)
         m2 = re.search(b"<div><h3>(.*?)</h3><span.*?>(.*?)</span></div>", html, re.I | re.S)
